@@ -1,10 +1,7 @@
 import React, { useState } from "react";
-
-import Color from './Color';
 import EditMenu from './EditMenu';
-import { useHistory, useParams } from 'react-router-dom';
 import { axiosWithAuth } from '../helpers/axiosWithAuth';
-import PrivateRoute from "./PrivateRoute";
+
 const initialColor = {
   color: "",
   code: { hex: "" }
@@ -14,7 +11,7 @@ const ColorList = ({ colors, updateColors, updatedList, setList }) => {
   console.log(colors)
   const [editing, setEditing] = useState(false);
   const [colorToEdit, setColorToEdit] = useState(initialColor);
-  const { id } = useParams()
+
 
   const editColor = color => {
     setEditing(true);
@@ -27,7 +24,7 @@ const ColorList = ({ colors, updateColors, updatedList, setList }) => {
       .put(`/colors/${colorToEdit.id}`, colorToEdit)
       .then(res => {
         setList(!updatedList)
-        console.log(colors)
+
       })
       .catch(err => {
         console.log(err)
@@ -50,12 +47,32 @@ const ColorList = ({ colors, updateColors, updatedList, setList }) => {
     <div className="colors-wrap">
       <p>colors</p>
       <ul>
-        {colors.map(color => <Color key={color.id} editing={editing} color={color} editColor={editColor} deleteColor={deleteColor} />)}
+        {colors.map(color => (
+          <li key={color.color} onClick={() => editColor(color)}>
+            <span>
 
+              <span
+                data-testid='color-test'
+                className="delete"
+                onClick={e => {
+                  e.stopPropagation();
+                  deleteColor(color)
+                }
+
+                }
+              >
+                x
+              </span>{" "}
+              {color.color}
+            </span>
+            <div
+              className="color-box"
+              style={{ backgroundColor: color.code.hex }}
+            />
+          </li>
+        ))}
       </ul>
-
       { editing && <EditMenu colorToEdit={colorToEdit} saveEdit={saveEdit} setColorToEdit={setColorToEdit} setEditing={setEditing} />}
-
     </div>
   );
 };
